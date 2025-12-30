@@ -4,6 +4,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 // const connectDB = require('./config/db'); // Assuming you have this from previous context
 const workflowRoutes = require('./routes/workflowRoutes');
+const gtmRoutes = require('./routes/gtmRoutes');
 
 dotenv.config();
 
@@ -34,6 +35,8 @@ app.use(express.json());
 app.get('/', (req, res) => {
   res.send('Outmate API is running...');
 });
+
+app.use('/api/gtm-tweets', gtmRoutes);
 
 // ✅ Add Workflow Routes
 app.use('/api/workflows', workflowRoutes);
