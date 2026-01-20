@@ -2,13 +2,24 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
-// const connectDB = require('./config/db'); // Assuming you have this from previous context
 const workflowRoutes = require('./routes/workflowRoutes');
 const gtmRoutes = require('./routes/gtmRoutes');
+const promptRoutes = require('./routes/promptRoutes');
+const tipRoutes = require('./routes/tipRoutes');
+// ✅ Import Tool Routes
+const toolRoutes = require('./routes/toolRoutes');
+// ✅ Automation
+const cron = require('node-cron');
+const { runEngine } = require('./scripts/run-gtm-engine');
+
+// 🕒 Schedule GTM Engine to run every day at midnight (00:00)
+cron.schedule('0 0 * * *', () => {
+  console.log('⏰ CRON JOB STARTED: Running GTM Engine...');
+  runEngine(false); // false = logic only, no process.exit()
+});
 
 dotenv.config();
 
-// Standard MongoDB Connection (if you don't have connectDB)
 const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGO_URI);
@@ -23,9 +34,8 @@ connectDB();
 
 const app = express();
 
-// ✅ UNIVERSAL CORS FIX
 app.use(cors({
-  origin: '*', 
+  origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
@@ -37,11 +47,12 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/gtm-tweets', gtmRoutes);
-
-// ✅ Add Workflow Routes
 app.use('/api/workflows', workflowRoutes);
+app.use('/api/prompts', promptRoutes);
+app.use('/api/tips', tipRoutes);
+// ✅ Register Tool Routes
+app.use('/api/tools', toolRoutes);
 
-// Error Handler
 app.use((err, req, res, next) => {
   console.error("🔥 SERVER ERROR:", err);
   res.status(500).json({ error: err.message });
