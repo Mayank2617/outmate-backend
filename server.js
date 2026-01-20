@@ -4,10 +4,10 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const workflowRoutes = require('./routes/workflowRoutes');
 const gtmRoutes = require('./routes/gtmRoutes');
-const promptRoutes = require('./routes/promptRoutes');
+// const promptRoutes = require('./routes/promptRoutes');
 const tipRoutes = require('./routes/tipRoutes');
 // ✅ Import Tool Routes
-const toolRoutes = require('./routes/toolRoutes');
+// const toolRoutes = require('./routes/toolRoutes');
 // ✅ Automation
 const cron = require('node-cron');
 const { runEngine } = require('./scripts/run-gtm-engine');
@@ -48,10 +48,10 @@ app.get('/', (req, res) => {
 
 app.use('/api/gtm-tweets', gtmRoutes);
 app.use('/api/workflows', workflowRoutes);
-app.use('/api/prompts', promptRoutes);
+// app.use('/api/prompts', promptRoutes);
 app.use('/api/tips', tipRoutes);
 // ✅ Register Tool Routes
-app.use('/api/tools', toolRoutes);
+// app.use('/api/tools', toolRoutes);
 
 app.use((err, req, res, next) => {
   console.error("🔥 SERVER ERROR:", err);
