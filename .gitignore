@@ -1,11 +1,11 @@
 node_modules
 .env
 .DS_Store
-controllers/promptsController.js
-controllers/toolsController.js
-models/Prompt.js
-models/Tool.js
-models/PromptCategory.js
-routes/promptsRoutes.js
-routes/toolsRoutes.js
+# controllers/promptsController.js
+# controllers/toolsController.js
+# models/Prompt.js
+# models/Tool.js
+# models/PromptCategory.js
+# routes/promptsRoutes.js
+# routes/toolsRoutes.js
 
