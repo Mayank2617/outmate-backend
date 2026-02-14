@@ -1,28 +1,31 @@
 const mongoose = require('mongoose');
 
 const workflowSchema = new mongoose.Schema({
-  name: { 
-    type: String, 
+  name: {
+    type: String,
     required: true,
-    index: true 
+    index: true
   },
-  filePath: { 
-    type: String, 
-    required: true, 
-    unique: true 
+  description: {
+    type: String
+  },
+  filePath: {
+    type: String,
+    required: true,
+    unique: true
   }, // Stores the path in the repo (e.g., "automation/gmail-to-slack.json")
-  json: { 
-    type: Object, 
-    required: true 
+  json: {
+    type: Object,
+    required: true
   }, // The actual full n8n JSON code
-  nodes: [{ 
-    type: String 
+  nodes: [{
+    type: String
   }], // Array of node types used (e.g., ["Telegram", "Google Sheets"])
-  githubUrl: { 
-    type: String 
+  githubUrl: {
+    type: String
   },
-  sha: { 
-    type: String 
+  sha: {
+    type: String
   } // GitHub hash to track if file has changed (for updates)
 }, { timestamps: true });
 

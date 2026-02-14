@@ -4,7 +4,7 @@ const Workflow = require('../models/Workflow');
 // GitHub Repo Details
 const REPO_OWNER = 'Zie619';
 const REPO_NAME = 'n8n-workflows';
-const BRANCH = 'main'; 
+const BRANCH = 'main';
 
 // Helper: Clean node names
 const extractNodeNames = (n8nJson) => {
@@ -18,12 +18,12 @@ const extractNodeNames = (n8nJson) => {
 // 1. SYNC FUNCTION
 exports.syncWorkflows = async (req, res) => {
   console.log("🔄 Starting n8n Workflow Sync...");
-  
+
   try {
     // A. Fetch the File Tree from GitHub
     const treeUrl = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/git/trees/${BRANCH}?recursive=1`;
     const treeRes = await axios.get(treeUrl);
-    
+
     if (!treeRes.data.tree) throw new Error("Could not fetch repository tree");
 
     // B. Filter for .json files only
@@ -40,12 +40,12 @@ exports.syncWorkflows = async (req, res) => {
 
       if (existing && existing.sha === file.sha) {
         skipped++;
-        continue; 
+        continue;
       }
 
       // D. Download Raw Content
       const rawUrl = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}/${file.path}`;
-      
+
       try {
         const contentRes = await axios.get(rawUrl);
         const workflowData = contentRes.data;
@@ -61,6 +61,7 @@ exports.syncWorkflows = async (req, res) => {
             name: name,
             filePath: file.path,
             json: workflowData,
+            description: workflowData.description || (workflowData.meta ? workflowData.meta.description : ""),
             nodes: nodeTypes,
             githubUrl: `https://github.com/${REPO_OWNER}/${REPO_NAME}/blob/${BRANCH}/${file.path}`,
             sha: file.sha
@@ -72,7 +73,7 @@ exports.syncWorkflows = async (req, res) => {
         else added++;
 
         if ((added + updated + skipped) % 50 === 0) {
-            console.log(`⏳ Processed ${added + updated + skipped}/${jsonFiles.length} workflows...`);
+          console.log(`⏳ Processed ${added + updated + skipped}/${jsonFiles.length} workflows...`);
         }
 
       } catch (err) {
@@ -82,7 +83,7 @@ exports.syncWorkflows = async (req, res) => {
 
     console.log(`✅ Sync Complete! Added: ${added}, Updated: ${updated}, Skipped: ${skipped}`);
     if (res) {
-        res.json({ success: true, message: `Sync Complete. Added: ${added}, Updated: ${updated}` });
+      res.json({ success: true, message: `Sync Complete. Added: ${added}, Updated: ${updated}` });
     }
 
   } catch (error) {
@@ -113,11 +114,11 @@ exports.getWorkflows = async (req, res) => {
 
     // Category Logic (filtering by node types)
     if (category && category !== 'All') {
-        query.nodes = { $regex: category, $options: 'i' };
+      query.nodes = { $regex: category, $options: 'i' };
     }
 
     const workflows = await Workflow.find(query)
-      .select('name nodes githubUrl createdAt') // Exclude heavy 'json'
+      .select('name description nodes githubUrl createdAt') // Exclude heavy 'json'
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
@@ -137,11 +138,11 @@ exports.getWorkflows = async (req, res) => {
 
 // 3. GET SINGLE WORKFLOW
 exports.getWorkflowById = async (req, res) => {
-    try {
-        const workflow = await Workflow.findById(req.params.id);
-        if(!workflow) return res.status(404).json({error: "Not found"});
-        res.json(workflow);
-    } catch (error) {
-        res.status(500).json({ error: "Server Error" });
-    }
+  try {
+    const workflow = await Workflow.findById(req.params.id);
+    if (!workflow) return res.status(404).json({ error: "Not found" });
+    res.json(workflow);
+  } catch (error) {
+    res.status(500).json({ error: "Server Error" });
+  }
 };
